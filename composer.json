@@ -1,0 +1,22 @@
+{
+    "name": "martin-yeung/phalapihelper",
+    "description": "phalapi 2.* helper",
+    "keywords": ["api", "helper", "phalapi"],
+    "license" : "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "martin",
+            "email": "martin.yeung@foxmail.com",
+            "homepage": "http://github.com/martin-yeung",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "MartinYeung\\PhalapiHelper\\": "src"
+        }
+    }
+}
