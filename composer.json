@@ -3,6 +3,7 @@
     "description": "phalapi 2.* helper",
     "keywords": ["api", "helper", "phalapi"],
     "license" : "GPL-3.0-or-later",
+    "type": "library",
     "authors": [
         {
             "name": "martin",
