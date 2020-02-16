@@ -154,11 +154,7 @@ class Lite {
 	// 需要对public/../data/给其777权限
 	public function getAccessToken() {
 		$token_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={$this->appid}&secret={$this->secret}";
-<<<<<<< HEAD
 		$file = @file_get_contents("./../data/access_token.json", true);
-=======
-		$file = file_get_contents("./../data/access_token.json", true);
->>>>>>> 1ed1ccc2f38723be615b4053e0ddd16eb2c21044
 		$result = json_decode($file, true);
 		if (($result == null) || (time() > $result['expires'])) {
 			// 进行access_token更新
@@ -495,4 +491,72 @@ class Lite {
 		}
 		return $reqPar;
 	}
+
+	/**
+	 * 获取小程序码
+	 *
+	 * @desc 获取小程序二维码。
+     * @oaran strubg 参数：最大32个可见字符，只支持数字，大小写英文以及部分特殊字符：!#$&'()*+,/:;=?@-._~，其它字符请自行编码为合法字符（因不支持%，中文无法使用 urlencode 处理，请使用其他编码方式
+     * @param string 路径：必须是已经发布的小程序存在的页面（否则报错），例如 pages/index/index, 根路径前不要填加 /,不能携带参数（参数请放在scene字段里），如果不填写这个字段，默认跳主页面
+	 * @return array
+	 * @return int ret 状态码：200表示数据获取成功
+	 * @return array data 返回数据,数据获取失败时为空
+	 * @return string data.appId 微信分配的小程序ID
+	 * @return string data.timeStamp 时间戳从1970年1月1日00:00:00至今的秒数,即当前的时间
+	 * @return string data.nonceStr 随机字符串，长度为32个字符以下。
+	 * @return string data.package 统一下单接口返回的 prepay_id 参数值
+	 * @return string data.signType 签名算法，暂支持 MD5
+	 * @return string data.paySign 签名,具体签名方案参见小程序支付接口文档;
+	 * @return string msg 错误提示信息
+	 */
+    public function getWxacode($scene, $page='', $width='430', $is_hyaline=true){
+        //header('content-type:image/gif');
+        //header('content-type:image/png');格式自选，不同格式貌似加载速度略有不同，想加载更快可选择jpg
+        //header('content-type:image/jpg');
+        $data = array();
+        $data['scene'] = $scene;
+        $data['page'] = $page;
+        $data['width'] = $width;
+        $data['is_hyaline'] = $is_hyaline;
+        $data = json_encode($data);
+
+        $path = './uploads/qracode_' . md5($data) . '.png';
+        if(is_file($path)) {
+            return $path;
+        }
+
+		$access_token = $this->getAccessToken()['access_token'];
+        $url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" . $access_token;
+        $da = $this->postJson($url, $data);
+        if($da) {
+            if (strpos($da, 'errcode') === false) {
+                @file_put_contents($path, $da);
+                if(is_file($path)) {
+                    return $path;
+                }
+            }
+        }
+
+        return false;
+    }
+    private function postJson($url, $data){
+        $ch = curl_init();
+        $header = array("Accept-Charset: utf-8");
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (compatible; MSIE 5.01; Windows NT 5.0)');
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($ch, CURLOPT_AUTOREFERER, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $tmpInfo = curl_exec($ch);
+        if (curl_errno($ch)) {
+            return false;
+        }else{
+            return $tmpInfo;
+        }
+    }
 }
