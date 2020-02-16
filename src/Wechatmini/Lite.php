@@ -495,19 +495,13 @@ class Lite {
 	/**
 	 * 获取小程序码
 	 *
-	 * @desc 获取小程序二维码。
-     * @oaran strubg 参数：最大32个可见字符，只支持数字，大小写英文以及部分特殊字符：!#$&'()*+,/:;=?@-._~，其它字符请自行编码为合法字符（因不支持%，中文无法使用 urlencode 处理，请使用其他编码方式
-     * @param string 路径：必须是已经发布的小程序存在的页面（否则报错），例如 pages/index/index, 根路径前不要填加 /,不能携带参数（参数请放在scene字段里），如果不填写这个字段，默认跳主页面
-	 * @return array
-	 * @return int ret 状态码：200表示数据获取成功
-	 * @return array data 返回数据,数据获取失败时为空
-	 * @return string data.appId 微信分配的小程序ID
-	 * @return string data.timeStamp 时间戳从1970年1月1日00:00:00至今的秒数,即当前的时间
-	 * @return string data.nonceStr 随机字符串，长度为32个字符以下。
-	 * @return string data.package 统一下单接口返回的 prepay_id 参数值
-	 * @return string data.signType 签名算法，暂支持 MD5
-	 * @return string data.paySign 签名,具体签名方案参见小程序支付接口文档;
-	 * @return string msg 错误提示信息
+	 * @desc 获取小程序二维码,生成在./uploads目录下。
+     * @param scene strubg 参数：最大32个可见字符，只支持数字，大小写英文以及部分特殊字符：!#$&'()*+,/:;=?@-._~，其它字符请自行编码为合法字符（因不支持%，中文无法使用 urlencode 处理，请使用其他编码方式
+     * @param path string 路径：必须是已经发布的小程序存在的页面（否则报错），例如 pages/index/index, 根路径前不要填加 /,不能携带参数（参数请放在scene字段里），如果不填写这个字段，默认跳主页面
+     * @param width number 宽度，二维码的宽度，单位 px，最小 280px，最大 1280px，默认430
+     * @param width boolean 是否需要透明底色，为 true 时，生成透明底色的小程序
+	 * @return bool false获取生成失败
+	 * @return string 小程序二维码的文件路径
 	 */
     public function getWxacode($scene, $page='', $width='430', $is_hyaline=true){
         //header('content-type:image/gif');
@@ -520,7 +514,7 @@ class Lite {
         $data['is_hyaline'] = $is_hyaline;
         $data = json_encode($data);
 
-        $path = './uploads/qracode_' . md5($data) . '.png';
+        $path = './uploads/qracode_' . md5($data) . '.' . ($is_hyaline ? 'png' : 'jpg');
         if(is_file($path)) {
             return $path;
         }
