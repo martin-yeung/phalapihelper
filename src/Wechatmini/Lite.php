@@ -154,7 +154,11 @@ class Lite {
 	// 需要对public/../data/给其777权限
 	public function getAccessToken() {
 		$token_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={$this->appid}&secret={$this->secret}";
+<<<<<<< HEAD
 		$file = @file_get_contents("./../data/access_token.json", true);
+=======
+		$file = file_get_contents("./../data/access_token.json", true);
+>>>>>>> 1ed1ccc2f38723be615b4053e0ddd16eb2c21044
 		$result = json_decode($file, true);
 		if (($result == null) || (time() > $result['expires'])) {
 			// 进行access_token更新
