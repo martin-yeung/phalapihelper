@@ -15,6 +15,7 @@ class Lite {
 	protected $mch_id;
 	protected $mch_key;
 	protected $notify_url;
+	protected $time_expire;
 
 	protected $openid; //openid
 	protected $out_trade_no; //商户订单号
@@ -41,6 +42,18 @@ class Lite {
 		//if (!$this->secret) {
 		//	throw new BadRequestException('请配置secret_key', 600);
 		//}
+		if (!$this->mch_id) {
+			throw new BadRequestException('请配置mch_id', 600);
+		}
+		if (!$this->mch_key) {
+			throw new BadRequestException('请配置mch_key', 600);
+		}
+		if (!$this->notify_url) {
+			throw new BadRequestException('请配置notify_url', 600);
+		}
+        if(!$this->time_expire) {
+            $this->time_expire = date('YmdHis', time() + 86400); //订单支付的过期时间(eg:一天过期)
+        }
 	}
 
 	/**
@@ -59,7 +72,7 @@ class Lite {
 	 * @return string msg 错误提示信息
 	 */
 
-	public function WxPay($openid, $total_fee, $body, $out_trade_no='', $notify_url='') {
+	public function WxPay($total_fee, $body, $out_trade_no='', $notify_url='') {
 		if (!$this->mch_id) {
 			throw new BadRequestException('请配置商户号', 600);
 		}
@@ -69,10 +82,6 @@ class Lite {
 		if (!$this->notify_url) {
 			throw new BadRequestException('请配置支付结果接收网址', 600);
 		}
-		if (!$openid) {
-			throw new BadRequestException('openid不能为空', 600);
-		}
-
 		if ($total_fee < 0.01) {
 			throw new BadRequestException('付款金额最低0.01', 600);
 		}
@@ -97,7 +106,7 @@ class Lite {
         }
 
 		$this->out_trade_no = $out_trade_no;
-		$this->openid = $openid;
+		//$this->openid = $openid;
 		$this->body = $body;
 		$this->total_fee = $total_fee;
 		// 统一下单接口
@@ -107,15 +116,17 @@ class Lite {
 	// 统一下单接口
 	private function unifiedorder() {
 		$url = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
-		$parameters = array('appid' => $this->appid, // 小程序ID
+		$parameters = array(
+            'appid' => $this->appid, // App应用ID
+			'body' => $this->body, // 商品描述
 			'mch_id' => $this->mch_id, // 商户号
 			'nonce_str' => $this->createNoncestr(), // 随机字符串
-			'body' => $this->body, // 商品描述
-			'out_trade_no' => $this->out_trade_no, // 商户订单号
-			'total_fee' => floatval($this->total_fee * 100), // 总金额 单位 分
-			'spbill_create_ip' => $_SERVER['REMOTE_ADDR'], // 终端IP
 			'notify_url' => $this->notify_url, // 通知地址  确保外网能正常访问
-			'openid' => $this->openid, // 用户id
+			'out_trade_no' => $this->out_trade_no, // 商户订单号
+			'spbill_create_ip' => $this->get_client_ip(), // 终端IP
+			'attach' => $this->get_client_ip(), // 终端IP
+			'total_fee' => floatval($this->total_fee * 100), // 总金额 单位 分
+			'time_expire' => $this->time_expire, // 交易结束时间
 			'trade_type' => 'APP'// 交易类型
 		);
 		// 统一下单签名
@@ -182,8 +193,8 @@ class Lite {
 		// 统一下单接口
 		$unifiedorder = $this->unifiedorder();
         //p($unifiedorder);
-        if($unifiedorder['result_code'] == 'FAIL') {
-            throw new BadRequestException($unifiedorder['err_code_des'],  -41003 - 400);
+        if($unifiedorder['return_code'] == 'FAIL') {
+            throw new BadRequestException($unifiedorder['return_msg'],  -41003 - 400);
         }
 		$parameters = array(
             'appId' => $this->appid, // App应用ID
@@ -259,4 +270,22 @@ class Lite {
             return $tmpInfo;
         }
     }
+
+    /**
+	 * 获取当前服务器的IP
+	 *
+	 * @return Ambigous <string, unknown>
+	 */
+	private function get_client_ip() {
+		if (isset($_SERVER['REMOTE_ADDR'])) {
+			$cip = $_SERVER['REMOTE_ADDR'];
+		} elseif (getenv("REMOTE_ADDR")) {
+			$cip = getenv("REMOTE_ADDR");
+		} elseif (getenv("HTTP_CLIENT_IP")) {
+			$cip = getenv("HTTP_CLIENT_IP");
+		} else {
+			$cip = "127.0.0.1";
+		}
+		return $cip;
+	}
 }

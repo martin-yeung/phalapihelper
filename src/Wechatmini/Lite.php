@@ -438,8 +438,8 @@ class Lite {
 		// 统一下单接口
 		$unifiedorder = $this->unifiedorder();
         //p($unifiedorder);
-        if($unifiedorder['result_code'] == 'FAIL') {
-            throw new BadRequestException($unifiedorder['err_code_des'],  -41003 - 400);
+        if($unifiedorder['return_code'] == 'FAIL') {
+            throw new BadRequestException($unifiedorder['return_msg'],  -41003 - 400);
         }
 		$parameters = array('appId' => $this->appid, // 小程序ID
 			'timeStamp' => '' . time() . '', // 时间戳
