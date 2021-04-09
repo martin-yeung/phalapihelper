@@ -60,20 +60,20 @@ class Lite {
 		if (!$code) {
 			throw new BadRequestException('请在小程序获取code', 600);
 		}
-		$url = "https://api.weixin.qq.com/sns/jscode2session?appid={$this->appid}&secret={$this->secret}&js_code=$code&grant_type=authorization_code";
+		$url = "https://api.weixin.qq.com/sns/jscode2session?appid={$this->appid}&secret={$this->secret}&js_code={$code}&grant_type=authorization_code";
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		$out = curl_exec($ch);
 		curl_close($ch);
+        //throw new BadRequestException($out, 900-400);
 		$jsondecode = json_decode($out, true); //对JSON格式的字符串进行编码
-		if ($jsondecode['openid']) {
+		if (isset($jsondecode['openid']) && $jsondecode['openid']) {
 			return $jsondecode;
-		} else {
-			// openid获取失败
-			throw new BadRequestException($jsondecode['errmsg'], $jsondecode['errcode'] - 400);
 		}
+        // openid获取失败
+        throw new BadRequestException($jsondecode['errmsg'], $jsondecode['errcode'] - 400);
 	}
 
 	/**
