@@ -197,12 +197,12 @@ class Lite {
             throw new BadRequestException($unifiedorder['return_msg'],  -41003 - 400);
         }
 		$parameters = array(
-            'appId' => $this->appid, // App应用ID
-            'partnerId' => $this->mch_id, // 商户ID
-			'timeStamp' => '' . time() . '', // 时间戳
-			'nonceStr'  => $this->createNoncestr(), // 随机串
-			'prepayId'  => $unifiedorder['prepay_id'], // 数据包
-			'package'   => 'Sign=WXPay', // 包
+            'appId'         => $this->appid, // App应用ID
+            'partnerId'     => $this->mch_id, // 商户ID
+			'timeStamp'     => '' . time() . '', // 时间戳
+			'nonceStr'      => $this->createNoncestr(), // 随机串
+			'prepayId'      => $unifiedorder['prepay_id'], // 数据包
+			'packageValue'  => 'Sign=WXPay', // 包
 			//'signType'  => 'MD5'// 签名方式
 		);
 		// 签名
