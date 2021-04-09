@@ -202,11 +202,14 @@ class Lite {
 			'timeStamp'     => '' . time() . '', // 时间戳
 			'nonceStr'      => $this->createNoncestr(), // 随机串
 			'prepayId'      => $unifiedorder['prepay_id'], // 数据包
-			'packageValue'  => 'Sign=WXPay', // 包
-			//'signType'  => 'MD5'// 签名方式
+			'package'       => 'Sign=WXPay', // 包
+			//'signType'      => 'MD5'// 签名方式
 		);
 		// 签名
-		$parameters['paySign'] = $this->getSign($parameters);
+		$parameters['signValue'] = $this->getSign($parameters);
+		$parameters['signType'] = 'MD5';
+		$parameters['packageValue'] = $parameters['package'];
+        unset($parameters['package']);
 		return $parameters;
 	}
 	// 作用：产生随机字符串，不长于32位
@@ -242,7 +245,7 @@ class Lite {
 			if ($urlencode) {
 				$v = urlencode($v);
 			}
-			$buff .= $k . "=" . $v . "&";
+			$buff .= strtolower($k) . "=" . $v . "&";
 		}
 		if (strlen($buff) > 0) {
 			$reqPar = substr($buff, 0, strlen($buff) - 1);

@@ -2,6 +2,7 @@
 phalapi 2.* helper
 
 //=======================================================config助手====================================================
+
 @public/init.php
 defined('API_ROOT') || define('API_ROOT', dirname(__FILE__) . '/..');
 
@@ -40,6 +41,16 @@ return array(
 
 
 //=======================================================微信小程序助手====================================================
-
+@config/di.php
+//注册微信小程序扩展
+$di->wechatmini = function() {
+    //return new \PhalApi\Wechatmini\Lite();
+    return new \MartinYeung\PhalapiHelper\Wechatmini\Lite();
+};
 
 //=======================================================微信支付App助手====================================================
+@config/di.php
+//注册微信App扩展
+$di->wechatapp = function() {
+    return new \MartinYeung\PhalapiHelper\Wechatapp\Lite();
+};
