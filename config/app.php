@@ -14,4 +14,16 @@ return array(
         'mch_key'       => '支付秘钥',//不用支付可以不用配置
         'notify_url'    => '支付结果接收网址',//不用支付可以不用配置
     ),
+
+
+    'PHPMailer' => array(
+        'email' => array(
+            'host' => 'smtp.gmail.com',
+            'username' => 'XXX@gmail.com',
+            'password' => '******',
+            'from' => 'XXX@gmail.com',
+            'fromName' => 'XX团队',
+            'sign' => '<br/><br/>请不要回复此邮件，谢谢！<br/><br/>-- XX团队敬上 ',
+        ),
+    ),
 );
