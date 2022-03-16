@@ -56,3 +56,11 @@ $di->wechatmini = function() {
 $di->wechatapp = function() {
     return new \MartinYeung\PhalapiHelper\Wechatapp\Lite();
 };
+
+//=======================================================微信支付Native助手====================================================
+
+@config/di.php
+//注册微信App扩展
+$di->wechatnative = function() {
+    return new \MartinYeung\PhalapiHelper\Wechatnative\Lite();
+};
